@@ -1,0 +1,17 @@
+# Virtual environment
+venv/
+.env/
+
+# Python
+__pycache__/
+*.pyc
+
+# Vector database
+chroma_db/
+
+# Large processed data
+data/documents/
+data/processed/
+
+# Models
+models/
