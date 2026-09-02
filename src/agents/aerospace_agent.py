@@ -3,6 +3,12 @@ from src.tools.report_generator import FailureReportGenerator
 from src.tools.failure_classifier import FailureClassifier
 from src.tools.risk_assessor import RiskAssessor
 from src.tools.maintenance_advisor import MaintenanceAdvisor
+from src.tools.troubleshooting_agent import TroubleshootingAgent
+from tools.root_cause_analyzer import RootCauseAnalyzer
+from src.tools.system_dependency_analyzer import SystemDependencyAnalyzer
+from src.tools.flight_impact_analyzer import FlightImpactAnalyzer
+from src.tools.procedure_advisor import ProcedureAdvisor
+
 
 class AerospaceAgent:
 
@@ -29,8 +35,17 @@ class AerospaceAgent:
 
         self.risk_assessor = RiskAssessor()     
 
-        self.maintenance_advisor = MaintenanceAdvisor()   
+        self.maintenance_advisor = MaintenanceAdvisor() 
 
+        self.troubleshooter = TroubleshootingAgent()  
+
+        self.root_cause = RootCauseAnalyzer()
+
+        self.system_dependency_analyzer = SystemDependencyAnalyzer()
+
+        self.flight_impact_analyzer = FlightImpactAnalyzer()
+
+        self.procedure_advisor = ProcedureAdvisor()
     # =========================================================
     # RUN AGENT
     # =========================================================
@@ -63,6 +78,26 @@ class AerospaceAgent:
                 classification
             )
 
+            troubleshooting = self.troubleshooter.troubleshoot(
+                classification
+            )
+
+            root_causes = self.root_cause.analyze(
+                classification
+            )
+
+            system_dependencies = self.system_dependency_analyzer.analyze(
+                classification
+            )
+
+            flight_impact = self.flight_impact_analyzer.analyze(
+                classification
+            )
+
+            procedures = self.procedure_advisor.advise(
+                classification
+            )
+
             context = self.build_failure_context(
                 analysis
             )
@@ -77,7 +112,12 @@ class AerospaceAgent:
                 classification=classification,
                 risk=risk,
                 maintenance=maintenance,
-                analysis=answer
+                troubleshooting=troubleshooting,
+                root_causes=root_causes,
+                analysis=answer,
+                system_dependencies=system_dependencies,
+                flight_impact=flight_impact,
+                procedures=procedures
             )
 
         # -----------------------------------------------------
