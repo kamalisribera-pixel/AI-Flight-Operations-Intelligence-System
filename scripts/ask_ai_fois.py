@@ -1,5 +1,6 @@
 from src.retrieval.retriever import AerospaceRetriever
 from src.generation.llm_engine import AerospaceLLMEngine
+from src.agents.aerospace_agent import AerospaceAgent
 
 
 
@@ -18,47 +19,17 @@ def main():
     retriever = AerospaceRetriever()
 
 
-    results = retriever.retrieve(
-        question,
-        top_k=5
-    )
-
-
-    context_parts = []
-
-
-    for i, document in enumerate(
-        results["documents"][0]
-    ):
-
-        metadata = results["metadatas"][0][i]
-
-
-        context_parts.append(
-            f"""
-    Document:
-    {metadata.get('source')}
-
-    Page:
-    {metadata.get('page_number')}
-
-    Content:
-    {document}
-    """
-        )
-
-
-    context = "\n\n".join(
-        context_parts
-    )
-
-
     llm = AerospaceLLMEngine()
 
 
-    answer = llm.generate(
-        question,
-        context
+    agent = AerospaceAgent(
+        retriever,
+        llm
+    )
+
+
+    answer = agent.run(
+        question
     )
 
 
