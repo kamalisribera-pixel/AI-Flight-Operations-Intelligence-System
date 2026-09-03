@@ -1,6 +1,4 @@
-from src.retrieval.retriever import AerospaceRetriever
-from src.generation.llm_engine import AerospaceLLMEngine
-from src.agents.aerospace_agent import AerospaceAgent
+from src.services.query_service import QueryService
 
 
 
@@ -16,25 +14,11 @@ def main():
     )
 
 
-    retriever = AerospaceRetriever()
-
-
-    llm = AerospaceLLMEngine()
-
-
-    agent = AerospaceAgent(
-        retriever,
-        llm
-    )
-
-
-    answer = agent.run(
-        question
-    )
+    result = QueryService().ask(question)
 
 
     print("\nAI_FOIS:")
-    print(answer)
+    print(result["answer"])
 
 
 

@@ -1,26 +1,21 @@
-from pathlib import Path
 import json
 
+from config.settings import CHUNKS_FILE, PROCESSED_DOCUMENTS_FILE
+from config.logging_config import logger
 from src.ingestion.chunker import AerospaceDocumentChunker
 
 
-INPUT_PATH = Path(
-    "data/processed/documents.json"
-)
+INPUT_PATH = PROCESSED_DOCUMENTS_FILE
 
 
-OUTPUT_PATH = Path(
-    "data/processed/chunks.json"
-)
+OUTPUT_PATH = CHUNKS_FILE
 
 
 
 def main():
 
 
-    print("=" * 60)
-    print("AI_FOIS DOCUMENT CHUNKING")
-    print("=" * 60)
+    logger.info("Starting document chunking")
 
 
     with open(
@@ -42,9 +37,7 @@ def main():
 
 
 
-    print(
-        f"Chunks Created: {len(chunks)}"
-    )
+    logger.info("Chunks created: %s", len(chunks))
 
 
 
@@ -69,14 +62,8 @@ def main():
 
 
 
-    print(
-        f"Saved: {OUTPUT_PATH}"
-    )
-
-
-    print("=" * 60)
-    print("CHUNKING COMPLETE")
-    print("=" * 60)
+    logger.info("Chunks saved: %s", OUTPUT_PATH)
+    logger.info("Document chunking complete")
 
 
 

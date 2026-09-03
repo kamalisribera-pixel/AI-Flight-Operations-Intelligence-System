@@ -393,6 +393,9 @@ Technical documents are transformed into semantic chunks and indexed for efficie
 AI_FOIS/
 
 ├── app/
+│   ├── components/
+│   ├── pages/
+│   └── streamlit_app.py
 
 ├── data/
 │   ├── documents/
@@ -409,12 +412,18 @@ AI_FOIS/
 │   ├── generation/
 │   ├── ingestion/
 │   ├── retrieval/
+│   ├── services/
 │   └── tools/
+
+├── database/
+│   ├── fois.db
+│   └── schema.sql
 
 ├── vector_db/
 
 ├── README.md
 ├── requirements.txt
+├── .env.example
 └── .gitignore
 ```
 

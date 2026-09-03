@@ -11,6 +11,9 @@ chroma_db/
 
 # Large processed data
 data/documents/
+.env
+__pycache__/
+.pytest_cache/
 data/processed/
 
 # Models

@@ -1,10 +1,11 @@
+from config.config import RETRIEVAL_TOP_K
 from src.tools.failure_analysis import FailureAnalysisTool
 from src.tools.report_generator import FailureReportGenerator
 from src.tools.failure_classifier import FailureClassifier
 from src.tools.risk_assessor import RiskAssessor
 from src.tools.maintenance_advisor import MaintenanceAdvisor
 from src.tools.troubleshooting_agent import TroubleshootingAgent
-from tools.root_cause_analyzer import RootCauseAnalyzer
+from src.tools.root_cause_analyzer import RootCauseAnalyzer
 from src.tools.system_dependency_analyzer import SystemDependencyAnalyzer
 from src.tools.flight_impact_analyzer import FlightImpactAnalyzer
 from src.tools.procedure_advisor import ProcedureAdvisor
@@ -115,7 +116,7 @@ class AerospaceAgent:
                 troubleshooting=troubleshooting,
                 root_causes=root_causes,
                 analysis=answer,
-                system_dependencies=system_dependencies,
+                dependencies=system_dependencies,
                 flight_impact=flight_impact,
                 procedures=procedures
             )
@@ -224,7 +225,7 @@ Information:
         results = self.retriever.retrieve(
 
             question,
-            top_k=5
+            top_k=RETRIEVAL_TOP_K
 
         )
 

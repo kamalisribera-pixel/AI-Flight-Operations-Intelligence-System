@@ -1,3 +1,5 @@
+from config.config import RETRIEVAL_TOP_K
+from config.logging_config import logger
 from src.retrieval.retriever import AerospaceRetriever
 
 
@@ -70,9 +72,7 @@ TEST_CASES = [
 def evaluate():
 
 
-    print("="*60)
-    print("AI_FOIS RETRIEVAL EVALUATION")
-    print("="*60)
+    logger.info("Starting retrieval evaluation")
 
 
 
@@ -86,21 +86,13 @@ def evaluate():
     for index, case in enumerate(TEST_CASES):
 
 
-        print(
-            f"\nTEST {index+1}"
-        )
-
-
-        print(
-            "Question:",
-            case["question"]
-        )
+        logger.info("Test %s: %s", index + 1, case["question"])
 
 
 
         results = retriever.retrieve(
             case["question"],
-            top_k=5
+            top_k=RETRIEVAL_TOP_K
         )
 
 
@@ -137,15 +129,8 @@ def evaluate():
 
 
 
-        print(
-            f"Score: {score:.2f}"
-        )
-
-
-        print(
-            "Retrieved:",
-            results["metadatas"][0][0]
-        )
+        logger.info("Score: %.2f", score)
+        logger.info("Retrieved: %s", results["metadatas"][0][0])
 
 
 
@@ -158,14 +143,7 @@ def evaluate():
     )
 
 
-    print("\n")
-    print("="*60)
-
-    print(
-        f"Average Retrieval Score: {final_score:.2f}"
-    )
-
-    print("="*60)
+    logger.info("Average retrieval score: %.2f", final_score)
 
 
 

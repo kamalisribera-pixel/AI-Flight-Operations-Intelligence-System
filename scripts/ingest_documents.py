@@ -2,8 +2,6 @@ from pathlib import Path
 import sys
 import json
 
-from scipy import stats
-
 # Add project root to Python path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -12,18 +10,16 @@ sys.path.append(
 )
  
 
+from config.settings import DOCUMENTS_DIR, PROCESSED_DOCUMENTS_FILE
+from config.logging_config import logger
 from src.ingestion.document_loader import AerospaceDocumentLoader
 # =========================================================
 # CONFIGURATION
 # =========================================================
 
-DOCUMENT_PATH = Path(
-    "data/documents"
-)
+DOCUMENT_PATH = DOCUMENTS_DIR
 
-OUTPUT_PATH = Path(
-    "data/processed/documents.json"
-)
+OUTPUT_PATH = PROCESSED_DOCUMENTS_FILE
 
 
 # =========================================================
@@ -32,9 +28,7 @@ OUTPUT_PATH = Path(
 
 def main():
 
-    print("=" * 60)
-    print("AI_FOIS DOCUMENT INGESTION")
-    print("=" * 60)
+    logger.info("Starting document ingestion")
 
 
     loader = AerospaceDocumentLoader(
@@ -46,41 +40,24 @@ def main():
     stats = loader.get_statistics()
 
 
-    print()
-
-    print("=" * 60)
-    print("INGESTION STATISTICS")
-    print("=" * 60)
+    logger.info("Ingestion statistics")
 
 
-    print(
-        f"Documents Found: {stats['documents_found']}"
-    )
+    logger.info("Documents found: %s", stats["documents_found"])
 
 
-    print(
-        f"Documents Processed: {stats['documents_processed']}"
-    )
+    logger.info("Documents processed: %s", stats["documents_processed"])
 
 
-    print(
-        f"Total Pages: {stats['total_pages']}"
-    )
-
-
-    print()
+    logger.info("Total pages: %s", stats["total_pages"])
 
     for document in stats["documents"]:
 
-        print(
-            f"{document['filename']}"
+        logger.info(
+            "Processed %s (%s pages)",
+            document["filename"],
+            document["pages"]
         )
-
-        print(
-            f"Pages: {document['pages']}"
-        )
-
-        print("-" * 40)
 
 
     OUTPUT_PATH.parent.mkdir(
@@ -103,14 +80,8 @@ def main():
         )
 
 
-    print(
-        f"Saved: {OUTPUT_PATH}"
-    )
-
-
-    print("=" * 60)
-    print("DOCUMENT INGESTION COMPLETE")
-    print("=" * 60)
+    logger.info("Documents saved: %s", OUTPUT_PATH)
+    logger.info("Document ingestion complete")
 
 
 

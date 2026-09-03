@@ -1,5 +1,13 @@
 import chromadb
 
+from config.config import (
+    CHROMA_COLLECTION_NAME,
+    CHROMA_PERSIST_DIR,
+    RETRIEVAL_TOP_K,
+    VECTOR_INSERT_BATCH_SIZE
+)
+from config.logging_config import logger
+
 
 
 class AerospaceVectorStore:
@@ -7,16 +15,16 @@ class AerospaceVectorStore:
 
     def __init__(
         self,
-        path="vector_db"
+        path=CHROMA_PERSIST_DIR
     ):
 
         self.client = chromadb.PersistentClient(
-            path=path
+            path=str(path)
         )
 
 
         self.collection = self.client.get_or_create_collection(
-            name="aerospace_knowledge"
+            name=CHROMA_COLLECTION_NAME
         )
 
 
@@ -25,13 +33,13 @@ class AerospaceVectorStore:
         self,
         chunks,
         embeddings,
-        batch_size=5000
+        batch_size=VECTOR_INSERT_BATCH_SIZE
     ):
 
         # Prevent duplicate insertion
         if self.collection.count() > 0:
 
-            print(
+            logger.info(
                 "Vector database already exists."
             )
 
@@ -94,7 +102,7 @@ class AerospaceVectorStore:
 
             )
 
-        print(
+        logger.info(
             f"Inserted {end}/{total} chunks"
         )
 
@@ -102,7 +110,7 @@ class AerospaceVectorStore:
     def search(
         self,
         query_embedding,
-        n_results=5
+        n_results=RETRIEVAL_TOP_K
     ):
 
         return self.collection.query(

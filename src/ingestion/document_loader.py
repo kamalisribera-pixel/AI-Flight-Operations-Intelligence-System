@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from config.logging_config import logger
 from src.ingestion.pdf_loader import AerospacePDFLoader
 
 
@@ -71,7 +72,7 @@ class AerospaceDocumentLoader:
         for pdf_file in pdf_files:
 
 
-            print(
+            logger.info(
                 f"Loading document: {pdf_file.name}"
             )
 

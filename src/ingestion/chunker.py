@@ -1,10 +1,13 @@
+from config.config import CHUNK_OVERLAP, CHUNK_SIZE
+
+
 class AerospaceDocumentChunker:
 
     def __init__(
         self,
         documents,
-        chunk_size=1000,
-        overlap=200
+        chunk_size=CHUNK_SIZE,
+        overlap=CHUNK_OVERLAP
     ):
 
         self.documents = documents

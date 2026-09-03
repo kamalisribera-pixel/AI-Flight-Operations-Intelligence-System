@@ -1,3 +1,4 @@
+from config.config import EMBEDDING_MODEL_NAME
 from sentence_transformers import SentenceTransformer
 
 
@@ -14,7 +15,7 @@ class AerospaceEmbeddingModel:
     def __init__(self):
 
         self.model = SentenceTransformer(
-            "BAAI/bge-small-en-v1.5"
+            EMBEDDING_MODEL_NAME
         )
 
 

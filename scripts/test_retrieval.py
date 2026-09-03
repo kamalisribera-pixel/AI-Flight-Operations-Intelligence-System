@@ -1,3 +1,5 @@
+from config.config import RETRIEVAL_TOP_K
+from config.logging_config import logger
 from src.retrieval.retriever import AerospaceRetriever
 
 
@@ -5,9 +7,7 @@ from src.retrieval.retriever import AerospaceRetriever
 def main():
 
 
-    print("="*60)
-    print("AI_FOIS RETRIEVAL TEST")
-    print("="*60)
+    logger.info("Starting retrieval test")
 
 
     retriever = AerospaceRetriever()
@@ -22,7 +22,7 @@ def main():
 
     results = retriever.retrieve(
         query,
-        top_k=5
+        top_k=RETRIEVAL_TOP_K
     )
 
 
@@ -30,19 +30,8 @@ def main():
         results["documents"][0]
     ):
 
-        print("\nRESULT", i+1)
-
-        print(
-            document[:500]
-        )
-
-
-        print(
-            results["metadatas"][0][i]
-        )
-
-
-    print("="*60)
+        logger.info("Result %s: %s", i + 1, document[:500])
+        logger.info("Metadata: %s", results["metadatas"][0][i])
 
 
 

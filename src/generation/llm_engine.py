@@ -1,3 +1,4 @@
+from config.config import LLM_MODEL_NAME, LLM_TEMPERATURE, MAX_TOKENS
 from langchain_ollama import OllamaLLM
 
 
@@ -8,8 +9,9 @@ class AerospaceLLMEngine:
     def __init__(self):
 
         self.llm = OllamaLLM(
-            model="llama3",
-            temperature=0.2
+            model=LLM_MODEL_NAME,
+            temperature=LLM_TEMPERATURE,
+            num_predict=MAX_TOKENS
         )
 
 

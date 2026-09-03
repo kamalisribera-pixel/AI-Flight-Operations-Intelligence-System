@@ -1,3 +1,4 @@
+from config.config import RETRIEVAL_TOP_K
 from src.database.vector_store import AerospaceVectorStore
 from src.embeddings.embedding_model import AerospaceEmbeddingModel
 
@@ -17,7 +18,7 @@ class AerospaceRetriever:
     def retrieve(
         self,
         query,
-        top_k=5
+        top_k=RETRIEVAL_TOP_K
     ):
 
 

@@ -1,3 +1,6 @@
+from config.config import RETRIEVAL_TOP_K
+
+
 class FailureAnalysisTool:
 
 
@@ -32,7 +35,7 @@ class FailureAnalysisTool:
 
         results = self.retriever.retrieve(
             query,
-            top_k=5
+            top_k=RETRIEVAL_TOP_K
         )
 
 

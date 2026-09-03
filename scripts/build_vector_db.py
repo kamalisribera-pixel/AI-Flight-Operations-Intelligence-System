@@ -1,24 +1,21 @@
-from pathlib import Path
 import json
 import numpy as np
 
+from config.settings import CHUNKS_FILE, EMBEDDINGS_FILE
+from config.logging_config import logger
 from src.embeddings.embedding_model import AerospaceEmbeddingModel
 from src.database.vector_store import AerospaceVectorStore
 
 
 
-INPUT_PATH = Path(
-    "data/processed/chunks.json"
-)
+INPUT_PATH = CHUNKS_FILE
 
 
 
 def main():
 
 
-    print("="*60)
-    print("AI_FOIS VECTOR DATABASE BUILD")
-    print("="*60)
+    logger.info("Starting vector database build")
 
 
 
@@ -45,15 +42,11 @@ def main():
     model = AerospaceEmbeddingModel()
 
 
-    EMBEDDING_PATH = Path(
-        "data/processed/embeddings.npy"
-    )
+    EMBEDDING_PATH = EMBEDDINGS_FILE
 
     if EMBEDDING_PATH.exists():
 
-        print(
-            "Loading existing embeddings..."
-        )
+        logger.info("Loading existing embeddings")
 
         embeddings = np.load(
             EMBEDDING_PATH
@@ -62,9 +55,7 @@ def main():
 
     else:
 
-        print(
-            "Generating embeddings..."
-        )
+        logger.info("Generating embeddings")
 
 
         embeddings = model.generate_embeddings(
@@ -78,14 +69,10 @@ def main():
         )
 
 
-        print(
-            "Embeddings saved."
-        )
+        logger.info("Embeddings saved")
 
 
-    print(
-        f"Generated embeddings: {len(embeddings)}"
-    )
+    logger.info("Generated embeddings: %s", len(embeddings))
 
 
 
@@ -98,12 +85,7 @@ def main():
     )
 
 
-    print(
-        "Vector database created"
-    )
-
-
-    print("="*60)
+    logger.info("Vector database created")
 
 
 
