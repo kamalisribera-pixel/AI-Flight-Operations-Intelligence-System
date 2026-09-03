@@ -64,73 +64,56 @@ Rather than functioning as a traditional chatbot, AI_FOIS retrieves relevant aer
 
 # 🏗️ System Architecture
 
-> *(Architecture diagram will be added here.)*
-
 ```text
 Aircraft Technical Documents
-            │
-            ▼
+           │
+           ▼
     Document Ingestion
-            │
-            ▼
-    Document Processing
-            │
-            ▼
-     Intelligent Chunking
-            │
-            ▼
-   Embedding Generation
-            │
-            ▼
-    Chroma Vector Database
-            │
-            ▼
-     Semantic Retrieval
-            │
-            ▼
+           │
+           ▼
+    Chunking and Embeddings
+           │
+           ▼
+     Chroma Vector Database
+           │
+           ▼
+      Semantic Retrieval
+           │
+           ▼
      Context Construction
-            │
-            ▼
-     Large Language Model
-        (Llama 3)
-            │
-            ▼
-     Aerospace AI Agent
-            │
-            ▼
-    Intelligent Tool Selection
-            │
-            ▼
- ┌──────────────────────────────────┐
- │ Failure Analysis                 │
- │ Failure Classification           │
- │ Root Cause Analysis              │
- │ Risk Assessment                  │
- │ Maintenance Advisor              │
- │ Troubleshooting Advisor          │
- │ Procedure Advisor                │
- │ Flight Impact Analyzer           │
- │ System Dependency Analyzer       │
- └──────────────────────────────────┘
-            │
-            ▼
-  Engineering Report Generation
-            │
-            ▼
-     Aerospace Decision Support
+           │
+           ▼
+     Local LLM (Ollama)
+           │
+           ▼
+  Aerospace Agent for failures
+           │
+           ▼
+ Specialized Python tools
+           │
+           ▼
+ Structured Engineering Report
 ```
 
 ---
 
 # 📸 Application Screenshots
 
-> Screenshots will be added after deployment.
+The current Streamlit interface includes the following workflows:
 
-* 🏠 Home Dashboard
-* 💬 Aerospace Assistant
-* 📄 Engineering Report
-* 🔍 Retrieval Results
-* ℹ️ About Page
+![AI-FOIS home dashboard](docs/images/home.png)
+
+![AI-FOIS Ask AI page](docs/images/Ask_AI_FOIS.png)
+
+![AI-FOIS failure analysis page](docs/images/failure_analysis.png)
+
+![AI-FOIS maintenance advisor](docs/images/maintenance_advisor.png)
+
+![AI-FOIS engineering reports](docs/images/engineering_reports.png)
+
+![AI-FOIS history page](docs/images/history.png)
+
+![AI-FOIS about page](docs/images/about.png)
 
 ---
 
@@ -393,9 +376,19 @@ Technical documents are transformed into semantic chunks and indexed for efficie
 AI_FOIS/
 
 ├── app/
+│   ├── assets/
 │   ├── components/
-│   ├── pages/
-│   └── streamlit_app.py
+│   └── runtime.py
+
+├── pages/
+│   ├── 1_Home.py
+│   ├── 2_Upload_Documents.py
+│   ├── 3_Ask_AI.py
+│   ├── 4_Failure_Analysis.py
+│   ├── 5_Maintenance_Advisor.py
+│   ├── 6_Engineering_Reports.py
+│   ├── 7_History.py
+│   └── 8_About.py
 
 ├── data/
 │   ├── documents/
@@ -416,7 +409,6 @@ AI_FOIS/
 │   └── tools/
 
 ├── database/
-│   ├── fois.db
 │   └── schema.sql
 
 ├── vector_db/
@@ -477,7 +469,13 @@ python -m scripts.build_vector_db
 
 ---
 
-# 🤖 Run AI_FOIS
+# 🤖 Run the Streamlit application
+
+```bash
+streamlit run streamlit_app.py
+```
+
+For the optional console assistant:
 
 ```bash
 python -m scripts.ask_ai_fois

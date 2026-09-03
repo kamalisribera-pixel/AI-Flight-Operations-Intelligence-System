@@ -12,7 +12,7 @@ Traditional keyword-based document search provides limited contextual understand
 
 Rather than functioning as a simple question-answering chatbot, AI-FOIS follows an engineering-oriented reasoning pipeline. User queries are transformed into semantic embeddings, relevant document sections are retrieved from a vector database, and a locally hosted language model synthesizes responses using only the retrieved context. The generated response is then enhanced through a collection of specialized engineering tools responsible for failure classification, risk assessment, maintenance recommendations, system dependency analysis, troubleshooting, and engineering report generation.
 
-The project demonstrates the integration of modern Generative AI techniques with software engineering principles to create a modular, maintainable, and extensible aerospace decision-support system. Beyond implementing Retrieval-Augmented Generation, this work explores how AI agents and structured tool-calling can transform static aviation manuals into an interactive engineering knowledge system capable of supporting aircraft maintenance workflows.
+The project demonstrates the integration of modern Generative AI techniques with software engineering principles to create a modular, maintainable, and extensible aerospace decision-support system. Beyond implementing Retrieval-Augmented Generation, this work explores how an orchestrating agent and specialized Python tools can transform static aviation manuals into an interactive engineering knowledge system capable of supporting aircraft maintenance workflows.
 
 
 
@@ -26,7 +26,7 @@ Recent advances in Generative Artificial Intelligence have introduced new approa
 
 Retrieval-Augmented Generation (RAG) addresses this limitation by combining semantic document retrieval with language generation. Instead of relying solely on the model's internal knowledge, relevant sections of aircraft documentation are retrieved from a vector database and supplied as contextual information before generating a response. This approach enables the system to produce grounded, context-aware answers while significantly reducing hallucinations.
 
-Building upon RAG, modern AI systems can further enhance reasoning through tool calling and AI agents. Rather than generating a single textual response, specialized tools can perform individual engineering tasks such as failure classification, risk assessment, maintenance recommendation, troubleshooting guidance, system dependency analysis, flight impact evaluation, and structured report generation. By distributing these responsibilities among dedicated AI agents, complex maintenance reasoning can be organized into a modular and extensible workflow.
+Building upon RAG, modern AI systems can further enhance reasoning through specialized tools and orchestration. Rather than generating a single textual response, Python tools perform individual engineering tasks such as failure classification, risk assessment, maintenance recommendation, troubleshooting guidance, system dependency analysis, flight impact evaluation, and structured report generation. These tools are coordinated sequentially by the Aerospace Agent.
 
 The objective of the Flight Operations Intelligent System (FOIS) is not to replace aircraft maintenance engineers or certified aviation personnel. Instead, it is designed as an intelligent decision-support system that assists users in retrieving relevant technical information, analyzing engineering problems, and organizing maintenance knowledge into clear, structured responses. The system combines document retrieval, grounded language generation, AI agents, and engineering tool pipelines to create an integrated aerospace knowledge assistant capable of supporting maintenance-related decision making.
 
@@ -147,6 +147,8 @@ The documents used in this project include:
 | Introduction to Flight (8th Edition) | Flight Principles |
 | Fundamentals of Aerodynamics (5th Edition) | Aerodynamics |
 | Aircraft Systems – Ian Moir & Allan Seabridge | Aircraft Systems & Maintenance |
+
+The repository also currently contains `Basic Python.pdf` in `data/documents/`. It is not an aerospace reference and should be removed or explicitly treated as a supplementary document before production deployment.
 
 These documents collectively provide information related to aircraft structures, hydraulic systems, electrical systems, flight controls, aerodynamics, aircraft performance, maintenance procedures, and operational principles.
 
@@ -563,7 +565,7 @@ Each tool focuses on a single engineering responsibility, allowing complex maint
 
 # 6.12 Engineering Report Generation
 
-The final stage of the workflow combines the retrieved knowledge, language model response, and outputs produced by the engineering tools into a structured engineering report.
+The final stage of the workflow combines the retrieved knowledge, language model response, and outputs produced by the engineering tools into a structured Python dictionary. The Streamlit UI and export modules then control how that data is displayed or serialized.
 
 Rather than presenting isolated pieces of information, the system organizes its findings into a comprehensive response that assists users in understanding maintenance scenarios, identifying possible causes, assessing operational risks, and recommending appropriate engineering actions.
 
@@ -880,28 +882,9 @@ Separating these workflows improves:
 
 ---
 
-# 7.5 Model Storage
+# 7.5 Model Configuration
 
-Location:
-
-```text
-models/
-```
-
-The models directory stores the AI models and supporting artifacts required during inference.
-
-Examples include:
-
-```text
-models/
-
-├── embedding_model/
-├── llm/
-├── tokenizer/
-└── configuration files
-```
-
-Separating model artifacts from application logic simplifies deployment and allows models to be updated independently of the application.
+The project does not store model artifacts in a repository `models/` directory. Model selection is configured through environment variables: `EMBEDDING_MODEL` selects the SentenceTransformer model and `LLM_MODEL` selects the Ollama model. The defaults are `BAAI/bge-small-en-v1.5` and `llama3`.
 
 ---
 
@@ -910,10 +893,16 @@ Separating model artifacts from application logic simplifies deployment and allo
 Location:
 
 ```text
-database/
+vector_db/
 ```
 
-The system uses a persistent vector database to store the aerospace knowledge base.
+The relational report and query database is defined separately under:
+
+```text
+database/schema.sql
+```
+
+The vector database stores the aerospace knowledge base, while the relational database stores queries, reports, and tool results.
 
 The database contains:
 
@@ -939,60 +928,29 @@ The data directory stores the aerospace documents and processed datasets used th
 
 ```text
 data/
-
-├── raw/
-├── processed/
-└── reference/
+├── documents/
+└── processed/
 ```
 
-The **raw** directory contains the original aerospace reference documents, while the **processed** directory stores cleaned text, document chunks, embeddings, and other intermediate artifacts generated during preprocessing.
+The **documents** directory contains the source PDFs, while the **processed** directory stores cleaned document data, chunks, and embeddings generated during preprocessing.
 
-Keeping raw and processed data separate preserves the integrity of the original documents and supports reproducible knowledge base construction.
+Keeping source and processed data separate supports reproducible knowledge base construction.
 
 ---
 
 # 7.8 Reporting Layer
 
-Location:
+Generated engineering reports are stored in the relational database rather than a `reports/` directory.
 
-```text
-reports/
-```
-
-The reports directory stores documentation and analytical outputs generated during development.
-
-Examples include:
-
-- Document statistics
-- Chunking reports
-- Retrieval analysis
-- Embedding analysis
-- System performance reports
-- Engineering evaluation summaries
-
-These reports provide insight into the behavior of the document processing pipeline and assist in validating the quality of the knowledge base.
+Evaluation and analysis outputs are produced by scripts and logs rather than being written to a dedicated report-output directory.
 
 ---
 
 # 7.9 Evaluation Results
 
-Location:
+Evaluation is performed by scripts under `scripts/`; the repository does not currently contain a dedicated `results/` directory.
 
-```text
-results/
-```
-
-The results directory contains outputs generated during system evaluation.
-
-Examples include:
-
-- Retrieval performance metrics
-- Response evaluation
-- Latency measurements
-- Agent execution results
-- Benchmark comparisons
-
-These results provide evidence of system performance and support future optimization efforts.
+Retrieval evaluation is implemented in `scripts/evaluate_retrieval.py` and retrieval checks in `scripts/test_retrieval.py`.
 
 ---
 
@@ -1064,7 +1022,7 @@ The language model is responsible for:
 - Understanding natural language questions.
 - Interpreting retrieved engineering context.
 - Synthesizing information from multiple reference documents.
-- Producing structured technical responses.
+- Producing concise plain-text technical responses.
 
 Running the language model locally provides several advantages:
 
@@ -2015,7 +1973,7 @@ The final application provides:
 - Risk assessment
 - Maintenance recommendations
 - Engineering report generation
-- Multi-agent reasoning visualization
+- Sequential engineering-tool analysis
 
 ---
 
@@ -2060,20 +2018,35 @@ The dashboard allows users to submit engineering questions, view retrieved docum
 The application is organized into multiple pages.
 
 ```text
-app/
-
-├── streamlit_app.py
-
-└── pages/
-
-    ├── 1_Home.py
-    ├── 2_Ask_AI.py
-    ├── 3_Failure_Analysis.py
-    ├── 4_Maintenance_Report.py
-    └── 5_About.py
+streamlit_app.py
+pages/
+├── 1_Home.py
+├── 2_Upload_Documents.py
+├── 3_Ask_AI.py
+├── 4_Failure_Analysis.py
+├── 5_Maintenance_Advisor.py
+├── 6_Engineering_Reports.py
+├── 7_History.py
+└── 8_About.py
 ```
 
 This modular design keeps individual application features independent and simplifies future development.
+
+## Current Application Screenshots
+
+![AI-FOIS home dashboard](images/home.png)
+
+![AI-FOIS Ask AI page](images/Ask_AI_FOIS.png)
+
+![AI-FOIS failure analysis page](images/failure_analysis.png)
+
+![AI-FOIS maintenance advisor](images/maintenance_advisor.png)
+
+![AI-FOIS engineering reports](images/engineering_reports.png)
+
+![AI-FOIS history page](images/history.png)
+
+![AI-FOIS about page](images/about.png)
 
 ---
 
@@ -2088,7 +2061,7 @@ Features include:
 - Supported aerospace documents
 - Technology stack
 - System architecture
-- Multi-agent workflow overview
+- Sequential engineering-tool workflow overview
 
 The Home page serves as the entry point for understanding the overall system before interacting with the assistant.
 
