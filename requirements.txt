@@ -1,0 +1,9 @@
+chromadb
+numpy
+ollama
+PyMuPDF
+sentence-transformers
+streamlit
+torch
+tqdm
+transformers
