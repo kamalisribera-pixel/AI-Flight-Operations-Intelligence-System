@@ -3,6 +3,8 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from config.settings import APP_DATABASE_FILE, DATABASE_SCHEMA_FILE
+from config.logging_config import logger
+from src.exceptions import DatabaseError
 
 
 class Database:
@@ -15,19 +17,31 @@ class Database:
 
     @contextmanager
     def connection(self):
-        connection = sqlite3.connect(self.database_path)
-        connection.row_factory = sqlite3.Row
-        connection.execute("PRAGMA foreign_keys = ON")
+        connection = None
         try:
+            connection = sqlite3.connect(self.database_path)
+            connection.row_factory = sqlite3.Row
+            connection.execute("PRAGMA foreign_keys = ON")
             yield connection
             connection.commit()
-        except Exception:
-            connection.rollback()
-            raise
+        except Exception as error:
+            if connection is not None:
+                connection.rollback()
+            logger.exception("Database operation failed")
+            if isinstance(error, DatabaseError):
+                raise
+            raise DatabaseError("Database operation failed.") from error
         finally:
-            connection.close()
+            if connection is not None:
+                connection.close()
 
     def initialize(self):
-        schema = self.schema_path.read_text(encoding="utf-8")
-        with self.connection() as connection:
-            connection.executescript(schema)
+        try:
+            schema = self.schema_path.read_text(encoding="utf-8")
+            with self.connection() as connection:
+                connection.executescript(schema)
+        except DatabaseError:
+            raise
+        except Exception as error:
+            logger.exception("Database initialization failed")
+            raise DatabaseError("Database initialization failed.") from error

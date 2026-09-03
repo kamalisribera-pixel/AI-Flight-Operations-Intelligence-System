@@ -5,7 +5,7 @@ import streamlit as st
 from src.services.agent_service import AgentService
 from src.services.ingestion_service import IngestionService
 from src.services.query_service import QueryService
-
+from src.services.export_service import ExportService
 
 ROOT = Path(__file__).resolve().parent
 
@@ -46,6 +46,17 @@ def get_ingestion_service():
     if "ingestion_service" not in st.session_state:
         st.session_state.ingestion_service = _cached_ingestion_service()
     return st.session_state.ingestion_service
+
+
+@st.cache_resource
+def _cached_export_service():
+    return ExportService()
+
+
+def get_export_service():
+    if "export_service" not in st.session_state:
+        st.session_state.export_service = _cached_export_service()
+    return st.session_state.export_service
 
 
 def initialize_state():

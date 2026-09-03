@@ -1,43 +1,597 @@
 :root {
-  --bg: #08121E;
-  --card: #101B2D;
-  --card-hover: #16263D;
-  --border: #22384E;
-  --primary: #4CC9FF;
-  --primary-hover: #74D8FF;
-  --success: #2ECC71;
-  --warning: #E8B04C;
-  --danger: #FF6B6B;
-  --text: #F8FAFC;
-  --muted: #9BAEC1;
+
+    --bg: #08121E;
+    --card: #101B2D;
+    --card-hover: #16263D;
+    --border: #22384E;
+
+    --primary: #4CC9FF;
+    --primary-hover: #74D8FF;
+
+    --success: #2ECC71;
+    --warning: #E8B04C;
+    --danger: #FF6B6B;
+
+    --text: #F8FAFC;
+    --muted: #9BAEC1;
+
 }
 
-[data-testid="stAppViewContainer"], .stApp { background: var(--bg); color: var(--text); font-family: "Segoe UI", sans-serif; }
-[data-testid="stSidebar"] { background: #0C1828; border-right: 1px solid var(--border); }
-[data-testid='stSidebar'] * { color: var(--text); }
-.block-container { max-width: 1180px; padding: 2rem; }
-h1, h2, h3 { color: var(--text); font-weight: 700; }
-h1 { font-size: 2.6rem; }
-.eyebrow { color: var(--primary); font-size: .8rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-.hero { background: var(--card); border: 1px solid var(--border); border-radius: 22px; padding: 40px; margin-bottom: 35px; }
-.hero h1 { color: var(--primary); margin-bottom: 12px; }
-.hero p { color: var(--muted); max-width: 850px; font-size: 18px; line-height: 1.8; }
-.panel { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 24px; height: 100%; margin-bottom: 20px; transition: .25s; }
-.panel:hover { border-color: var(--primary); }
-.panel h3 { margin-top: 0; }
-.metric { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 24px; transition: .25s; }
-.metric:hover { border-color: var(--primary); transform: translateY(-2px); }
-.metric strong { display: block; color: var(--primary); font-size: 32px; font-weight: 700; margin-top: 12px; }
-.metric span { color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
-.pipeline { display: flex; gap: .5rem; align-items: stretch; margin: 1.5rem 0; }
-.pipeline span { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: .8rem .65rem; color: var(--primary); font-weight: 700; text-align: center; text-transform: uppercase; }
-.pipeline i { color: var(--primary); align-self: center; font-style: normal; }
-.reference { border-left: 3px solid var(--warning); padding: .75rem 1rem; margin: .5rem 0; background: var(--card); }
-.reference small { color: var(--muted); }
-.status { display: inline-block; padding: .25rem .55rem; border-radius: 3px; font-size: .7rem; font-weight: 700; text-transform: uppercase; background: rgba(46,204,113,.12); color: var(--success); }
-[data-testid='stButton'] button { width: 100%; min-height: 52px; border: none; border-radius: 12px; background: var(--primary); color: var(--bg); font-size: 16px; font-weight: 700; transition: .25s; }
-[data-testid='stButton'] button:hover { background: var(--primary-hover); transform: translateY(-2px); }
-textarea, input { background: var(--card) !important; color: var(--text) !important; border-radius: 12px !important; }
-[data-baseweb="select"] { border-radius: 12px; }
-footer { visibility: hidden; }
-@media (max-width: 800px) { .block-container { padding: 1rem; } h1 { font-size: 2.2rem; } .hero { padding: 24px; } .pipeline { flex-direction: column; } .pipeline i { display: none; } }
+
+/* ===========================
+   APPLICATION
+=========================== */
+
+.stApp,
+[data-testid="stAppViewContainer"] {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", sans-serif;
+}
+
+.block-container {
+    max-width: 1180px;
+    padding: 2rem;
+}
+
+
+/* ===========================
+   STREAMLIT DEFAULT UI
+=========================== */
+
+header[data-testid="stHeader"] {
+    background: transparent;
+    height: 0;
+}
+
+[data-testid="stToolbar"],
+#MainMenu,
+footer {
+    visibility: hidden;
+}
+
+
+/* ===========================
+   SIDEBAR
+=========================== */
+
+[data-testid="stSidebar"] {
+    background: #0C1828;
+    border-right: 1px solid var(--border);
+}
+
+[data-testid="stSidebar"] * {
+    color: var(--text);
+}
+
+
+/* ===========================
+   TYPOGRAPHY
+=========================== */
+
+h1,
+h2,
+h3 {
+    color: var(--text);
+    font-weight: 700;
+}
+
+h1 {
+    font-size: 2.6rem;
+}
+
+.eyebrow {
+    color: var(--primary);
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+
+/* ===========================
+   HERO
+=========================== */
+
+.hero {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 40px;
+    margin-bottom: 35px;
+}
+
+.compact-hero {
+    margin-bottom: 18px;
+    padding-bottom: 28px;
+}
+
+.hero h1 {
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+.hero p {
+    color: var(--muted);
+    max-width: 850px;
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+
+/* ===========================
+   PANELS
+=========================== */
+
+.panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 20px;
+    transition: .25s;
+}
+
+.panel:hover {
+    border-color: var(--primary);
+}
+
+.panel h3 {
+    margin-top: 0;
+}
+
+
+/* ===========================
+   METRIC CARDS
+=========================== */
+
+.metric {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px;
+    transition: .25s;
+}
+
+.metric:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.metric strong {
+    display: block;
+    color: var(--primary);
+    font-size: 32px;
+    font-weight: 700;
+    margin-top: 12px;
+}
+
+.metric span {
+    color: var(--muted);
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+
+/* ===========================
+   PIPELINE
+=========================== */
+
+.pipeline {
+    display: flex;
+    gap: .5rem;
+    margin: 1.5rem 0;
+}
+
+.pipeline span {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: .8rem;
+    color: var(--primary);
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.pipeline i {
+    color: var(--primary);
+    align-self: center;
+    font-style: normal;
+}
+
+
+/* ===========================
+   REFERENCES
+=========================== */
+
+.reference {
+    background: var(--card);
+    border-left: 3px solid var(--warning);
+    padding: .75rem 1rem;
+    margin: .6rem 0;
+}
+
+.reference small {
+    color: var(--muted);
+}
+
+
+/* ===========================
+   STATUS BADGE
+=========================== */
+
+.status {
+    display: inline-block;
+    padding: .25rem .6rem;
+    border-radius: 4px;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: rgba(46,204,113,.12);
+    color: var(--success);
+}
+
+
+/* ===========================
+   BUTTONS
+=========================== */
+
+[data-testid="stButton"] button {
+    width: 100%;
+    min-height: 52px;
+    border: none;
+    border-radius: 12px;
+    background: var(--primary);
+    color: var(--bg);
+    font-size: 16px;
+    font-weight: 700;
+    transition: .25s;
+}
+
+[data-testid="stButton"] button:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+/* ===========================
+   INPUTS
+=========================== */
+
+.stTextInput input,
+.stTextArea textarea,
+.stNumberInput input,
+.stSelectbox,
+[data-baseweb="input"] input,
+[data-baseweb="textarea"] textarea,
+[data-baseweb="base-input"] {
+    background: var(--card) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.stTextInput label,
+.stTextArea label,
+[data-testid="stWidgetLabel"] {
+    color: #D7E3F4 !important;
+    font-size: .95rem !important;
+    font-weight: 600 !important;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"] {
+    background: rgba(16, 27, 45, .58);
+    border-color: var(--border) !important;
+    border-radius: 14px !important;
+    padding: 10px 18px 18px;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--muted) !important;
+}
+
+/* ===========================
+   FILE UPLOADER
+=========================== */
+
+[data-testid="stFileUploader"] {
+    background: var(--card);
+    border: 2px dashed var(--border);
+    border-radius: 18px;
+    padding: 18px;
+}
+
+/* Entire uploader */
+[data-testid="stFileUploader"] * {
+    color: var(--text) !important;
+}
+
+/* Upload button */
+[data-testid="stFileUploader"] button {
+    background: var(--primary) !important;
+    color: var(--bg) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+}
+
+[data-testid="stFileUploader"] button:hover {
+    background: var(--primary-hover) !important;
+}
+
+/* Drag & Drop area */
+[data-testid="stFileUploaderDropzone"] {
+    background: var(--card) !important;
+    border: 2px dashed var(--border) !important;
+}
+
+[data-testid="stFileUploaderDropzone"] * {
+    color: var(--text) !important;
+}
+
+/* =====================================
+   CHAT INPUT (FIXED)
+===================================== */
+
+/* Remove Streamlit's white bottom container */
+[data-testid="stBottom"]{
+    background: var(--bg) !important;
+    border-top: 1px solid var(--border) !important;
+}
+
+/* Bottom block */
+[data-testid="stBottomBlockContainer"]{
+    background: var(--bg) !important;
+    padding: 1rem 0 !important;
+}
+
+/* Chat input wrapper */
+[data-testid="stChatInput"]{
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 auto !important;
+}
+
+/* Remove extra wrapper backgrounds */
+[data-testid="stChatInput"] > div,
+[data-testid="stChatInput"] form{
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 18px !important;
+    box-shadow: none !important;
+}
+
+/* Text area */
+[data-testid="stChatInput"] textarea{
+    background: transparent !important;
+    color: var(--text) !important;
+    border: none !important;
+    box-shadow: none !important;
+    min-height: 40px !important;
+}
+
+/* Placeholder */
+[data-testid="stChatInput"] textarea::placeholder{
+    color: var(--muted) !important;
+}
+
+/* Send button */
+[data-testid="stChatInput"] button{
+    background: var(--primary) !important;
+    color: var(--bg) !important;
+    border: none !important;
+    border-radius: 12px !important;
+}
+
+[data-testid="stChatInput"] button:hover{
+    background: var(--primary-hover) !important;
+}
+
+
+/* ===========================
+   EXPANDERS
+=========================== */
+
+details {
+
+    background: var(--card);
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    margin-bottom: 12px;
+}
+
+summary {
+    color: var(--text);
+}
+
+
+/* ===========================
+   ALERTS
+=========================== */
+
+[data-testid="stAlert"] {
+
+    background: var(--card);
+    border: 1px solid var(--border);
+
+    color: var(--text);
+}
+
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width: 800px) {
+
+    .block-container {
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 2.2rem;
+    }
+
+    .hero {
+        padding: 24px;
+    }
+
+    .pipeline {
+        flex-direction: column;
+    }
+
+    .pipeline i {
+        display: none;
+    }
+
+}
+/* ================================
+   CHAT INPUT CONTAINER
+================================ */
+
+[data-testid="stChatInput"]{
+    background: transparent !important;
+}
+
+[data-testid="stChatInput"] > div{
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+[data-testid="stChatInput"] form{
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 16px !important;
+    padding: 8px 12px !important;
+}
+[data-testid="stChatInput"] textarea{
+    background: transparent !important;
+    color: var(--text) !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+[data-testid="stChatInput"] textarea::placeholder{
+    color: var(--muted) !important;
+}
+[data-testid="stChatInput"] button{
+    background: var(--primary) !important;
+    color: var(--bg) !important;
+    border-radius: 10px !important;
+    border: none !important;
+}
+
+[data-testid="stChatInput"] button:hover{
+    background: var(--primary-hover) !important;
+}
+
+/* =====================================
+   ENGINEERING REPORT TYPOGRAPHY
+===================================== */
+
+.stExpander h1{
+    font-size: 1.35rem !important;
+    color: var(--primary) !important;
+    margin: 0.8rem 0 !important;
+}
+
+.stExpander h2{
+    font-size: 1.1rem !important;
+    color: var(--text) !important;
+    margin: 0.7rem 0 !important;
+}
+
+.stExpander h3{
+    font-size: 1rem !important;
+    color: var(--text) !important;
+    margin: 0.6rem 0 !important;
+}
+
+.stExpander p,
+.stExpander li{
+    font-size: 0.95rem !important;
+    line-height: 1.7;
+}
+
+.stExpander hr{
+    margin: 1rem 0;
+    border-color: var(--border);
+}
+/* ---------- Markdown / Generated Report Text ---------- */
+
+.stMarkdown,
+.stMarkdown p,
+.stMarkdown li,
+.stMarkdown span,
+.stMarkdown div {
+    color: var(--text) !important;
+}
+
+/* Markdown headings */
+.stMarkdown h1,
+.stMarkdown h2,
+.stMarkdown h3,
+.stMarkdown h4,
+.stMarkdown h5,
+.stMarkdown h6 {
+    color: var(--primary) !important;
+    font-weight: 700;
+}
+
+/* Expander content */
+.streamlit-expanderContent {
+    color: var(--text) !important;
+}
+
+/* Report body */
+[data-testid="stExpanderDetails"] {
+    color: var(--text) !important;
+}
+
+/* Code blocks */
+pre,
+code {
+    background: var(--card) !important;
+    color: var(--text) !important;
+}
+
+/* Expander header */
+[data-testid="stExpander"] summary {
+    background: var(--card) !important;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: none !important;
+}
+
+/* Remove hover effect */
+[data-testid="stExpander"] summary:hover {
+    background: var(--card) !important;
+    border-color: var(--border) !important;
+}
+
+/* Remove active/focus effect */
+[data-testid="stExpander"] summary:focus,
+[data-testid="stExpander"] summary:active {
+    background: var(--card) !important;
+    outline: none !important;
+}
+
+/* Download buttons */
+[data-testid="stDownloadButton"] button {
+    background: var(--card) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px;
+}
+
+[data-testid="stDownloadButton"] button:hover {
+    background: var(--card-hover) !important;
+    border-color: var(--primary) !important;
+    color: var(--text) !important;
+}

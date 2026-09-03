@@ -5,3 +5,23 @@
 2026-09-03 09:47:20 | WARNING | AI_FOIS | No documents retrieved for query
 2026-09-03 09:48:41 | WARNING | AI_FOIS | No documents retrieved for query
 2026-09-03 09:51:36 | WARNING | AI_FOIS | No documents retrieved for query
+2026-09-03 11:08:11 | WARNING | AI_FOIS | No documents retrieved for query
+2026-09-03 11:09:03 | ERROR | AI_FOIS | Agent analysis failed
+Traceback (most recent call last):
+  File "c:\Users\ramya.DESK-GOLDY.000\Desktop\NIMMI\PROJECTS\AI_FOIS\src\services\agent_service.py", line 20, in analyze
+    return self.agent.run(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 9, in run
+RuntimeError: boom
+2026-09-03 11:09:20 | WARNING | AI_FOIS | No documents retrieved for query
+2026-09-03 11:56:35 | INFO | AI_FOIS | Engineering report created.
+2026-09-03 14:00:53 | INFO | AI_FOIS | Engineering report created.
+2026-09-03 14:00:53 | INFO | AI_FOIS | Engineering report created.
+2026-09-03 14:21:01 | INFO | AI_FOIS | Engineering report created.
+2026-09-03 14:25:54 | INFO | AI_FOIS | Engineering report created.
+2026-09-03 14:32:17 | INFO | AI_FOIS | Loading document: 1.PHA.pdf
+2026-09-03 14:32:24 | INFO | AI_FOIS | Loading document: 2.Introduction to flight 8th edition.pdf
+2026-09-03 14:32:26 | INFO | AI_FOIS | Loading document: 4.Fundamentals_of_Aerodynamics_5th_edition.pdf
+2026-09-03 14:32:29 | INFO | AI_FOIS | Loading document: 5.AIRCRAFT SYSTEMS BY IAN MOIR & ALLAN SEABRIDGE TRIBIKRAM.pdf
+2026-09-03 14:32:30 | INFO | AI_FOIS | Loading document: Basic Python.pdf
+2026-09-03 14:58:47 | INFO | AI_FOIS | Vector database already exists.

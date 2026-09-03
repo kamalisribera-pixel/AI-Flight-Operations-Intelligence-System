@@ -1,8 +1,30 @@
 class FailureReportGenerator:
 
-    # =========================================================
-    # GENERATE REPORT
-    # =========================================================
+    @staticmethod
+    def _value(value, fallback):
+        if value is None or str(value).strip().lower() in {"", "unknown", "none", "n/a"}:
+            return fallback
+        return str(value).strip()
+
+    @classmethod
+    def _root_cause_rows(cls, root_causes):
+        if not isinstance(root_causes, (list, tuple)):
+            root_causes = []
+
+        rows = []
+        for cause in root_causes:
+            if isinstance(cause, dict):
+                name = cls._value(cause.get("cause"), "Cause not identified")
+                confidence = cls._value(
+                    cause.get("probability") or cause.get("confidence"),
+                    "Unavailable"
+                )
+            else:
+                name = cls._value(cause, "Cause not identified")
+                confidence = "Unavailable"
+            rows.append(f"| {name} | {confidence} |")
+
+        return rows or ["| Cause not identified from the available evidence. | Unavailable |"]
 
     def generate(
         self,
@@ -18,85 +40,50 @@ class FailureReportGenerator:
         analysis
     ):
 
-        maintenance_text = "\n".join(
-            f"• {item}"
-            for item in maintenance
+        system = self._value(
+            (classification or {}).get("system"),
+            "System could not be identified from the available evidence."
         )
-
-        troubleshooting_text = "\n".join(
-            f"{i}. {step}"
-            for i, step in enumerate(troubleshooting, start=1)
+        severity = self._value(
+            (risk or {}).get("severity"),
+            "Unable to determine."
         )
-
-        dependency_text = "\n↓\n".join(
-            dependencies
+        impact = self._value(
+            (risk or {}).get("impact"),
+            "Operational impact could not be determined."
         )
-
-        impact_text = "\n↓\n".join(
-            flight_impact
+        priority = self._value(
+            (risk or {}).get("priority"),
+            "No priority action identified."
         )
-
-        procedure_text = "\n".join(
-            f"• {step}"
-            for step in procedures
-        )
-
-        report = f"""
-============================================================
-AI_FOIS FAILURE ANALYSIS REPORT
-============================================================
-
-Failure Scenario
-----------------
-{failure}
-
-Detected System
----------------
-{classification["system"]}
-
-Risk Assessment
----------------
-Severity : {risk["severity"]}
-
-Operational Impact
-------------------
-{risk["impact"]}
-
-Recommended Action
-------------------
-{risk["priority"]}
-
-Maintenance Recommendations
----------------------------
-{maintenance_text}
-
-Troubleshooting Procedures
----------------------------
-{troubleshooting_text}
-
-Root Cause Analysis
--------------------
-{root_causes}
-
-Engineering Analysis
---------------------
-{analysis}
-
-Flight Impact Assessment
--------------------------
-{impact_text}
-
-System Dependencies
--------------------
-{dependency_text}
-
-Procedures
-----------
-{procedure_text}
-
-============================================================
-END OF REPORT
-============================================================
-"""
-
-        return report
+        return {
+            "title": "Failure Analysis Report",
+            "system": system,
+            "failure": failure,
+            "summary": self._value(analysis, "Analysis was not available."),
+            "recommendation": priority,
+            "risk": severity,
+            "references": [],
+            "operational_impact": impact,
+            "maintenance": [
+                self._value(item, "Review the applicable maintenance procedure.")
+                for item in (maintenance or [])
+            ],
+            "troubleshooting": [
+                self._value(step, "Follow the approved troubleshooting procedure.")
+                for step in (troubleshooting or [])
+            ],
+            "root_causes": root_causes if isinstance(root_causes, list) else [],
+            "flight_impact": [
+                self._value(item, "No flight impact identified.")
+                for item in (flight_impact or [])
+            ],
+            "dependencies": [
+                self._value(item, "No dependency identified.")
+                for item in (dependencies or [])
+            ],
+            "procedures": [
+                self._value(item, "No additional procedure identified.")
+                for item in (procedures or [])
+            ],
+        }

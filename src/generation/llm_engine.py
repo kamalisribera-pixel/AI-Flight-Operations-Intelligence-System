@@ -15,47 +15,46 @@ class AerospaceLLMEngine:
         )
 
 
-
     def build_prompt(
         self,
         question,
         context
     ):
 
+        return f"""
+    You are AI_FOIS, an aerospace engineering assistant.
 
-        prompt = f"""
-You are AI_FOIS, an aerospace engineering assistant.
+    Use ONLY the provided aerospace documentation.
 
-Answer the question using ONLY the provided aerospace documents.
+    If the answer cannot be found in the documents, reply:
 
-If the information is not available in the context,
-say that you do not have enough information.
+    "Insufficient information is available in the provided documents."
 
-Provide a clear technical explanation.
+    Requirements:
 
-Always cite the document name and page number when using information from the context.
+    - Answer in plain text.
+    - DO NOT use Markdown headings (#, ##, ###).
+    - DO NOT create a report.
+    - DO NOT write titles.
+    - DO NOT use separator lines (==== or ----).
+    - Keep the response concise and technical.
+    - Separate documented facts from engineering reasoning.
+    - Cite the source document and page number whenever possible.
 
-Do not use information outside the provided context.
+    Context:
+    ----------------
+    {context}
 
-When explaining engineering concepts:
-- Separate information directly stated in the document from your own interpretation.
-- Do not claim the document states something unless it explicitly does.
+    Question:
+    ----------------
+    {question}
 
-Context:
-
-{context}
-
-
-Question:
-
-{question}
+    Technical Response:
+    ----------------
+    """
+    
 
 
-Answer:
-"""
-
-
-        return prompt
 
 
 

@@ -1,10 +1,16 @@
+from config.logging_config import logger
+
+from src.exceptions import (
+    AppError,
+    DatabaseError,
+    GenerationError,
+    ValidationError,
+)
 from src.services.agent_service import AgentService
 from src.services.generation_service import GenerationService
 from src.services.history_service import HistoryService
 from src.services.report_service import ReportService
 from src.services.retrieval_service import RetrievalService
-from src.exceptions import AppError
-from config.logging_config import logger
 
 
 class QueryService:
@@ -28,35 +34,87 @@ class QueryService:
 
     def ask(self, question):
         question = question.strip()
+
         if not question:
-            raise ValueError("Question cannot be empty.")
+            raise ValidationError(
+                "Please enter a question before submitting."
+            )
+
         query_id = self.history_service.save_query(question)
+
         analysis = None
 
         try:
             if self.agent_service.agent.is_failure_question(question):
+
                 analysis = self.agent_service.analyze(question)
+
                 answer = analysis
+
                 self.history_service.save_tool_result(
-                    query_id, "AerospaceAgent", str(analysis)
+                    query_id,
+                    "AerospaceAgent",
+                    str(analysis)
                 )
-                context, retrieval = "", {}
+
+                context = ""
+                retrieval = {}
+
             else:
-                context, retrieval = self.retrieval_service.build_context(question)
-                answer = self.generation_service.generate(question, context)
+
+                context, retrieval = (
+                    self.retrieval_service.build_context(question)
+                )
+
+                answer = self.generation_service.generate(
+                    question,
+                    context
+                )
+
         except AppError:
             raise
+
         except Exception as error:
-            logger.exception("Query processing failed")
-            raise AppError("The request could not be completed.") from error
-        result = self.report_service.create(
-            question=question,
-            answer=answer,
-            context=context,
-            analysis=analysis
-        )
-        result["retrieval"] = retrieval
-        result["query_id"] = query_id
-        result["report_id"] = self.history_service.save_report(query_id, str(answer))
-        result["history_id"] = result["report_id"]
-        return result
+            logger.exception(
+                "Unexpected error while processing query."
+            )
+
+            raise GenerationError(
+                "Unable to complete the engineering analysis."
+            ) from error
+
+        try:
+            result = self.report_service.create(
+                question=question,
+                answer=answer,
+                context=context,
+                analysis=analysis
+            )
+
+            result["retrieval"] = retrieval
+            if not result["references"] and retrieval:
+                result["references"] = retrieval.get("metadatas", [[]])[0]
+            result["query_id"] = query_id
+
+            result["report_id"] = self.history_service.save_report(
+                query_id,
+                result["summary"],
+                result["recommendation"],
+                result["risk"],
+            )
+
+            result["history_id"] = result["report_id"]
+
+            return result
+
+        except AppError:
+            raise
+
+        except Exception as error:
+            logger.exception(
+                "Failed to save engineering report."
+            )
+
+            raise DatabaseError(
+                "Unable to save the engineering report."
+            ) from error

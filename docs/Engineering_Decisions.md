@@ -1,583 +1,377 @@
 # Engineering Decisions
 
-## Flight Operations Intelligent System (FOIS)
+AI_FOIS was designed as an engineering system rather than a simple LLM application. Each major architectural decision was made by considering the problem being solved, available alternatives, engineering trade-offs, maintainability, and future scalability.
 
-This document explains the major technical and architectural decisions made during the development of the Flight Operations Intelligent System (FOIS).
+## 1. Modular Architecture
 
-The purpose of this document is to document the reasoning behind the system architecture, Retrieval-Augmented Generation (RAG) pipeline, AI agent design, tool-calling framework, vector database implementation, and software engineering decisions adopted throughout the project.
+**Decision:**
+The system is divided into independent modules for document ingestion, processing, embeddings, vector storage, retrieval, generation, agents, tools, results, testing, and the application layer.
 
----
+**Why:**
+FOIS evolved beyond a simple chatbot into an aerospace intelligence system with multiple responsibilities. Separating these responsibilities makes the system easier to maintain, debug, test, and extend.
 
-# 1. Project Architecture Decision
+**Alternative considered:**
+A single Python application containing the complete pipeline.
 
-## Decision
+**Why rejected:**
+A monolithic implementation would tightly couple the UI, retrieval, generation, and engineering logic, making future changes increasingly difficult.
 
-The project was structured into independent modules:
-
-```text
-app/
-src/
-data/
-database/
-embeddings/
-generation/
-retrieval/
-agents/
-tools/
-results/
-tests/
-docs/
-```
-
----
-
-## Reason
-
-As the project evolved beyond a simple chatbot into an intelligent aerospace assistant, it became necessary to separate responsibilities into dedicated modules.
-
-The application includes:
-
-- document ingestion
-- text processing
-- embedding generation
-- vector storage
-- semantic retrieval
-- language model inference
-- AI agent orchestration
-- engineering tool execution
-- Streamlit interface
-
-Separating these components improves:
-
-- maintainability
-- scalability
-- readability
-- debugging
-- future extensibility
-
----
-
-## Alternative Considered
-
-Implementing the complete application inside a single Python script.
-
----
-
-## Why It Was Not Selected
-
-A monolithic implementation tightly couples retrieval, generation, user interface, and engineering logic, making the system difficult to maintain and extend.
-
----
-
-## Future Improvement
-
-The architecture can later evolve into:
+**Future direction:**
+The architecture can evolve toward:
 
 ```text
 Frontend
-
-↓
-
+   ↓
 API Layer
-
-↓
-
+   ↓
 Agent Orchestrator
-
-↓
-
+   ↓
 RAG Service
-
-↓
-
+   ↓
 LLM Service
-
-↓
-
+   ↓
 Vector Database
-
-↓
-
+   ↓
 Monitoring & Logging
 ```
 
 ---
 
-# 2. Decision: Choosing Retrieval-Augmented Generation (RAG)
+## 2. Retrieval-Augmented Generation (RAG)
 
-## Decision
+**Decision:**
+FOIS uses Retrieval-Augmented Generation rather than relying solely on the language model's internal knowledge.
 
-The system uses a Retrieval-Augmented Generation (RAG) architecture instead of relying solely on a language model.
+**Why:**
+Aerospace maintenance documentation is large and continuously updated. Retrieving relevant information at query time allows the system to work with current technical documentation without retraining the language model.
 
----
+**Benefits:**
 
-## Reason
+* Grounded responses
+* Improved factual consistency
+* Reduced hallucination risk
+* Documentation updates without model retraining
 
-Aircraft maintenance documentation is extensive and continuously updated.
-
-Retrieval allows the language model to access relevant information at query time instead of memorizing documents during training.
-
-Benefits include:
-
-- grounded responses
-- improved factual accuracy
-- reduced hallucinations
-- support for updated documentation without retraining
-
----
-
-## Alternative Considered
-
+**Alternative considered:**
 Fine-tuning a language model on aerospace manuals.
 
----
+**Why rejected:**
+Fine-tuning introduces additional computational requirements and would require retraining when documentation changes.
 
-## Why It Was Not Selected
-
-Fine-tuning requires significant computational resources and retraining whenever documentation changes.
-
-RAG provides a more flexible and maintainable solution.
+**Future direction:**
+Introduce hybrid retrieval combining semantic search with keyword-based retrieval.
 
 ---
 
-## Future Improvement
+## 3. Local Language Model
 
-Hybrid retrieval combining semantic search and keyword search can further improve document retrieval quality.
+**Decision:**
+FOIS uses a locally hosted language model for inference.
 
----
+**Why:**
+Local inference provides greater control over the inference pipeline while supporting offline operation, privacy, and reduced dependence on external services.
 
-# 3. Decision: Choosing a Local Language Model
+**Alternative considered:**
+Cloud-hosted proprietary LLM APIs.
 
-## Decision
+**Why rejected:**
 
-A locally hosted language model was selected for inference.
+* Internet dependency
+* Recurring operational costs
+* Privacy considerations
+* Less control over inference infrastructure
 
----
-
-## Reason
-
-Running inference locally provides:
-
-- offline capability
-- improved privacy
-- lower operational cost
-- greater control over the inference pipeline
-
-This is particularly important when working with technical aerospace documentation.
+**Future direction:**
+Create a unified LLM interface allowing multiple interchangeable model backends.
 
 ---
 
-## Alternative Considered
+## 4. ChromaDB for Vector Storage
 
-Cloud-hosted proprietary language models.
-
----
-
-## Why It Was Not Selected
-
-Cloud services introduce:
-
-- recurring operational costs
-- internet dependency
-- privacy concerns
-- limited control over inference behavior
-
----
-
-## Future Improvement
-
-Support multiple interchangeable LLM backends through a unified inference interface.
-
----
-
-# 4. Decision: Choosing ChromaDB as the Vector Database
-
-## Decision
-
+**Decision:**
 ChromaDB was selected as the vector database.
 
----
+**Why:**
+FOIS requires persistent storage and similarity retrieval of document embeddings. ChromaDB provides a Python-friendly solution with persistent vector storage, metadata filtering, and similarity search.
 
-## Reason
+**Alternatives considered:**
 
-The system requires efficient storage and retrieval of document embeddings.
+* FAISS
+* Pinecone
+* Weaviate
+* Milvus
 
-ChromaDB provides:
+**Why ChromaDB:**
+For the project's local and educational deployment requirements, ChromaDB provides the required functionality without introducing additional distributed infrastructure.
 
-- persistent vector storage
-- metadata filtering
-- fast similarity search
-- simple Python integration
-
----
-
-## Alternative Considered
-
-- FAISS
-- Pinecone
-- Weaviate
-- Milvus
+**Future direction:**
+Evaluate distributed vector databases for larger-scale deployments.
 
 ---
 
-## Why It Was Not Selected
+## 5. Semantic Document Chunking
 
-For a local educational project, ChromaDB provides sufficient performance without requiring additional infrastructure.
+**Decision:**
+Documents are divided into overlapping text chunks before embedding.
 
----
+**Why:**
+Embedding an entire technical manual as a single vector would reduce retrieval precision. Smaller semantic chunks allow the retrieval system to identify relevant sections more accurately.
 
-## Future Improvement
+Overlap is used to preserve contextual continuity between adjacent sections.
 
-Migration to distributed vector databases for large-scale deployments.
+**Alternative considered:**
+Embedding complete documents as individual vectors.
 
----
+**Why rejected:**
+Large documents can exceed embedding constraints and make retrieval less precise.
 
-# 5. Decision: Semantic Document Chunking
+**Engineering principle:**
 
-## Decision
-
-Technical documents are divided into overlapping text chunks before embedding generation.
-
----
-
-## Reason
-
-Large language models have limited context windows.
-
-Chunking enables:
-
-- efficient retrieval
-- improved semantic matching
-- manageable embedding sizes
-
-Overlapping chunks preserve contextual continuity between adjacent sections.
+> Divide documents into semantically meaningful units while preserving enough surrounding context for accurate retrieval.
 
 ---
 
-## Alternative Considered
+## 6. Sentence Transformer Embeddings
 
-Embedding complete PDF documents as a single vector.
+**Decision:**
+Sentence Transformer models are used to generate document embeddings.
 
----
+**Why:**
+The system requires semantic retrieval rather than simple keyword matching. Dense embeddings allow related engineering concepts to be matched even when the exact words differ.
 
-## Why It Was Not Selected
+**Alternatives considered:**
 
-Entire manuals exceed embedding model limitations and reduce retrieval precision.
+* TF-IDF
+* Bag-of-Words
+* Keyword indexing
 
----
-
-## Engineering Principle
-
-> Documents should be divided into semantically meaningful chunks to maximize retrieval accuracy while preserving contextual information.
-
----
-
-# 6. Decision: Using Sentence Transformer Embeddings
-
-## Decision
-
-Sentence Transformer models were selected for embedding generation.
+**Why rejected:**
+Traditional lexical approaches have limited ability to capture semantic relationships between technical concepts.
 
 ---
 
-## Reason
+## 7. Grounded Generation
 
-Sentence Transformers generate dense semantic representations that capture contextual meaning rather than relying solely on keyword matching.
+**Decision:**
+The language model is instructed to generate responses using retrieved aerospace documentation as supporting context.
 
-Benefits include:
+**Why:**
+LLMs can generate plausible but incorrect information when operating without supporting evidence. Grounding constrains the generation process around retrieved technical information.
 
-- semantic similarity search
-- robust retrieval
-- efficient inference
-- compatibility with vector databases
+**Benefits:**
 
----
+* Better factual consistency
+* Improved engineering reliability
+* Greater transparency
+* Increased user trust
 
-## Alternative Considered
+**Alternative considered:**
+Unrestricted LLM generation.
 
-- TF-IDF
-- Bag-of-Words
-- Keyword indexing
-
----
-
-## Why It Was Not Selected
-
-Traditional lexical methods cannot capture semantic relationships between engineering concepts.
+**Why rejected:**
+For an aerospace-oriented system, unrestricted generation could produce unsupported maintenance or troubleshooting information.
 
 ---
 
-# 7. Decision: Grounding Responses with Retrieved Context
+## 8. Tool-Calling Architecture
 
-## Decision
+**Decision:**
+Specialized engineering tasks are delegated to dedicated tools rather than requiring the LLM to perform every task internally.
 
-The language model is instructed to answer only using retrieved aerospace documentation.
+**Why:**
+Language models are effective at language understanding and generation, while deterministic or specialized engineering operations benefit from explicit task boundaries.
 
----
+**Implemented capabilities include:**
 
-## Reason
+* Failure Classification
+* Risk Assessment
+* Maintenance Recommendation
+* Root Cause Analysis
+* System Dependency Analysis
+* Flight Impact Analysis
+* Procedure Recommendation
+* Troubleshooting
+* Engineering Report Generation
 
-Large language models may generate plausible but incorrect information when operating without supporting context.
+**Alternative considered:**
+One general-purpose LLM performing all engineering reasoning.
 
-Grounding responses improves:
+**Why rejected:**
+Separating responsibilities improves modularity, maintainability, and explainability.
 
-- factual consistency
-- engineering reliability
-- transparency
-- user trust
-
----
-
-## Alternative Considered
-
-Allowing unrestricted language model generation.
-
----
-
-## Why It Was Not Selected
-
-Ungrounded generation increases the likelihood of hallucinated maintenance procedures and inaccurate technical guidance.
-
----
-
-# 8. Decision: Tool Calling Architecture
-
-## Decision
-
-The language model delegates specialized engineering tasks to dedicated tools.
-
----
-
-## Reason
-
-Language models excel at natural language generation but complex engineering reasoning benefits from structured task decomposition.
-
-Dedicated tools provide deterministic outputs for specific responsibilities.
-
-Examples include:
-
-- Failure Classifier
-- Risk Assessor
-- Maintenance Advisor
-- Root Cause Analyzer
-- System Dependency Analyzer
-- Flight Impact Analyzer
-- Procedure Advisor
-- Troubleshooting Agent
-- Report Generator
-
----
-
-## Alternative Considered
-
-Allowing the language model to perform all engineering reasoning internally.
-
----
-
-## Why It Was Not Selected
-
-Separating responsibilities improves modularity, explainability, and maintainability.
-
----
-
-## Engineering Principle
+**Engineering principle:**
 
 > Each engineering task should have one clearly defined responsibility.
 
 ---
 
-# 9. Decision: Multi-Agent Architecture
+## 9. Multi-Agent Architecture
 
-## Decision
+**Decision:**
+FOIS uses specialized AI agents for different stages of aerospace engineering analysis.
 
-FOIS adopts an agent-based architecture where specialized AI agents collaborate to solve complex aerospace maintenance tasks.
+**Why:**
+Aircraft maintenance problems can involve multiple reasoning stages. Dividing these responsibilities allows each agent to focus on a specific task.
 
----
+**Example workflow:**
 
-## Reason
+```text
+User Problem
+     ↓
+Failure Classifier
+     ↓
+Root Cause Analyzer
+     ↓
+Risk Assessor
+     ↓
+System Dependency Analyzer
+     ↓
+Flight Impact Analyzer
+     ↓
+Procedure Advisor
+     ↓
+Report Generator
+```
 
-Aircraft maintenance involves multiple reasoning stages that are easier to manage when divided among independent agents.
+**Alternative considered:**
+A single conversational agent handling the complete workflow.
 
-Examples include:
+**Why rejected:**
+A monolithic agent becomes increasingly difficult to reason about, test, maintain, and extend as system complexity grows.
 
-- Failure Classifier
-- Root Cause Analyzer
-- Risk Assessor
-- System Dependency Analyzer
-- Flight Impact Analyzer
-- Procedure Advisor
-- Troubleshooting Agent
-- Report Generator
-
----
-
-## Alternative Considered
-
-Using a single general-purpose conversational agent.
-
----
-
-## Why It Was Not Selected
-
-A monolithic agent becomes increasingly difficult to maintain as engineering reasoning grows more complex.
-
----
-
-## Future Improvement
-
-Dynamic agent orchestration with collaborative multi-agent workflows.
+**Future direction:**
+Dynamic agent orchestration for more complex collaborative workflows.
 
 ---
 
-# 10. Decision: Choosing Streamlit for the User Interface
+## 10. Streamlit Interface
 
-## Decision
+**Decision:**
+Streamlit was selected for the initial application interface.
 
-Streamlit was selected for application development.
+**Why:**
+The primary engineering objective was to demonstrate the AI system rather than spend the majority of development effort on frontend infrastructure.
 
----
+Streamlit provides:
 
-## Reason
+* Rapid Python-based development
+* Interactive interfaces
+* Visualization support
+* Direct integration with the AI pipeline
 
-The primary objective was to demonstrate AI engineering rather than frontend development.
-
-Streamlit enables:
-
-- rapid prototyping
-- seamless Python integration
-- interactive dashboards
-- visualization support
-
----
-
-## Alternative Considered
-
+**Alternative considered:**
 React + FastAPI.
 
----
+**Why rejected:**
+A separate frontend would increase implementation complexity without directly improving the core AI engineering capabilities being demonstrated.
 
-## Why It Was Not Selected
-
-Developing a complete frontend would increase project complexity without contributing directly to the project's AI objectives.
-
----
-
-## Future Improvement
-
-The Streamlit interface can later be replaced with:
-
-- React
-- Angular
-- Mobile applications
-
-while keeping the AI backend unchanged.
+**Future direction:**
+The interface can be replaced with a production frontend while keeping the AI backend modular.
 
 ---
 
-# 11. Decision: Separating Retrieval and Generation
+## 11. Separation of Retrieval and Generation
 
-## Decision
+**Decision:**
+Retrieval and language generation are implemented as independent components.
 
-The retrieval pipeline and language generation pipeline were implemented as independent components.
+**Why:**
+This creates clear boundaries between knowledge retrieval and language generation.
 
----
+It also allows individual components to be replaced independently.
 
-## Reason
+For example:
 
-Separating these stages allows individual components to be replaced without affecting the remainder of the system.
+```text
+Embedding Model
+      ↓
+Vector Database
+      ↓
+Retrieval
+      ↓
+Context
+      ↓
+LLM
+      ↓
+Generation
+```
 
-Examples include:
+The embedding model, vector database, or language model can therefore be changed without redesigning the entire system.
 
-- replacing the embedding model
-- changing the vector database
-- switching to another language model
+**Engineering principle:**
 
----
-
-## Engineering Principle
-
-> Retrieval should locate knowledge, while generation should explain it.
-
----
-
-# 12. Decision: Persistent Conversation and Report Storage
-
-## Decision
-
-The system stores generated engineering reports and user interactions in a local database.
-
----
-
-## Reason
-
-Persistent storage enables:
-
-- report history
-- auditing
-- future analytics
-- engineering documentation
+> Retrieval locates knowledge; generation explains it.
 
 ---
 
-## Alternative Considered
+## 12. Persistent Storage
 
+**Decision:**
+FOIS stores generated engineering reports and user interactions in a local database.
+
+**Why:**
+Persistence enables:
+
+* Report history
+* Auditing
+* Future analytics
+* Engineering documentation
+
+**Alternative considered:**
 Displaying responses without storing them.
 
----
-
-## Why It Was Not Selected
-
-Generated reports would be lost after application shutdown.
+**Why rejected:**
+Generated engineering reports would be lost when the application shuts down.
 
 ---
 
-# 13. Decision: Structured Engineering Report Generation
+## 13. Structured Engineering Reports
 
-## Decision
+**Decision:**
+FOIS generates structured engineering reports instead of returning only conversational responses.
 
-Instead of returning plain conversational responses, FOIS generates structured engineering reports.
-
----
-
-## Reason
-
-Maintenance engineers require organized technical documentation rather than conversational text.
+**Why:**
+Engineering workflows require organized, traceable, and reusable technical documentation.
 
 Structured reports improve:
 
-- readability
-- traceability
-- documentation quality
-- maintenance workflow integration
+* Readability
+* Traceability
+* Documentation quality
+* Workflow integration
+
+**Output formats include:**
+
+```text
+Engineering Analysis
+├── PDF
+├── Markdown
+└── JSON
+```
+
+**Alternative considered:**
+Returning conversational responses only.
+
+**Why rejected:**
+Conversational responses are harder to archive, reference, audit, and integrate into engineering workflows.
 
 ---
 
-## Alternative Considered
+# Engineering Philosophy
 
-Returning conversational AI responses only.
+The central engineering philosophy behind AI_FOIS is:
 
----
+> **Build an intelligent aerospace assistant that is modular, explainable, maintainable, and grounded in reliable technical knowledge rather than relying solely on the reasoning capabilities of a language model.**
 
-## Why It Was Not Selected
+The architecture balances:
 
-Conversational responses are difficult to archive, reference, and integrate into engineering workflows.
+* AI engineering
+* Aerospace domain requirements
+* Software modularity
+* Maintainability
+* Scalability
+* Factual reliability
+* Explainability
+* Future extensibility
 
----
-
-# 14. Overall Engineering Philosophy
-
-The primary engineering principle followed throughout the development of FOIS was:
-
-> Build an intelligent aerospace assistant that is modular, explainable, maintainable, and grounded in reliable technical knowledge rather than relying solely on the reasoning capabilities of a language model.
-
-Every architectural decision was guided by balancing:
-
-- AI engineering principles
-- aerospace domain requirements
-- maintainability
-- scalability
-- modular software design
-- factual reliability
-- future extensibility
-
-The final system demonstrates the complete journey from raw aerospace documentation to an intelligent Retrieval-Augmented Generation system capable of supporting aircraft maintenance engineers through grounded AI reasoning and specialized engineering agents.
+The result is an end-to-end system that transforms aerospace documentation into a retrieval-grounded AI workflow capable of supporting specialized engineering analysis and structured reporting.
