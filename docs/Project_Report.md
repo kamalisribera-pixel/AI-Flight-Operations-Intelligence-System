@@ -884,7 +884,7 @@ Separating these workflows improves:
 
 # 7.5 Model Configuration
 
-The project does not store model artifacts in a repository `models/` directory. Model selection is configured through environment variables: `EMBEDDING_MODEL` selects the SentenceTransformer model and `LLM_MODEL` selects the Ollama model. The defaults are `BAAI/bge-small-en-v1.5` and `llama3`.
+The project does not store model artifacts in a repository `models/` directory. Model selection is configured through environment variables: `EMBEDDING_MODEL` selects the SentenceTransformer model and `LLM_MODEL` selects the Ollama model. The current defaults are `BAAI/bge-small-en-v1.5` and `llama3`. Gemma is not configured in this repository.
 
 ---
 
@@ -1013,7 +1013,7 @@ Using the same embedding model for both documents and queries ensures that simil
 
 # 8.3 Large Language Model
 
-The AI Flight Operations Intelligence System uses a locally deployed Large Language Model to generate engineering responses.
+The AI Flight Operations Intelligence System uses the Ollama model configured by `LLM_MODEL` to generate engineering responses. The current default is `llama3`; Gemma is not configured in this repository.
 
 Unlike conventional search systems that return matching document excerpts, the language model interprets retrieved aerospace documentation and produces coherent, context-aware explanations.
 

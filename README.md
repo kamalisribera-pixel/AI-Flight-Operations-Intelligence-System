@@ -83,7 +83,7 @@ Aircraft Technical Documents
      Context Construction
            │
            ▼
-     Local LLM (Ollama)
+      Local LLM (Ollama: llama3 by default)
            │
            ▼
   Aerospace Agent for failures
@@ -162,7 +162,7 @@ The current Streamlit interface includes the following workflows:
 ## 6. Large Language Model
 
 * Retrieval-Augmented Generation
-* Llama 3 using Ollama
+* Ollama model configured through `LLM_MODEL` (`llama3` by default)
 * Grounded response generation
 
 ---
@@ -287,7 +287,7 @@ Delegates specialized engineering tasks to dedicated tools such as failure analy
 
 ## Large Language Models
 
-Uses Llama 3 through Ollama to generate grounded engineering explanations based on retrieved aerospace knowledge.
+Uses the Ollama model configured through `LLM_MODEL` to generate grounded engineering explanations. The current default is `llama3`; Gemma is not configured in this repository.
 
 ---
 
@@ -336,7 +336,7 @@ Technical documents are transformed into semantic chunks and indexed for efficie
 ## Large Language Models
 
 * Ollama
-* Llama 3
+* Ollama model configured through `LLM_MODEL` (default: `llama3`)
 
 ---
 
@@ -528,7 +528,7 @@ python -m scripts.test_retrieval
 
 # 👨‍💻 Author
 
-**Lucky KB**
+**Kamalisri Bera**
 
 AI Engineering • Software Engineering • Aerospace Engineering
 
@@ -549,5 +549,5 @@ This project is released under the **MIT License**.
 * Hugging Face SentenceTransformers
 * ChromaDB
 * Ollama
-* Llama 3
+* Ollama model configured through `LLM_MODEL` (default: `llama3`)
 * Streamlit
